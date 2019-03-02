@@ -7,38 +7,58 @@
 #define SECOND(x) (x*1000ULL*1000ULL*1000ULL)
 PrintConsole topScreen, bottomScreen;
 using namespace std;
+void initServices();
+void exitServices();
+void fucked();
+
 
 void fucked() {
 	cout << "\n\nPress [Start] to exit";	
 	while (1) {
 		hidScanInput();
 		if (hidKeysDown() & KEY_START) { 
-			amExit();
-			gfxExit();
-			fsExit();	
+			exitServices();
 			exit(0);
 		}
 	}
 }
 
-int main(int argc, char* argv[])
-{
+
+void initServices() {
 	gfxInitDefault();
 	consoleInit(GFX_TOP, &topScreen);
 	consoleInit(GFX_BOTTOM, &bottomScreen);
 	consoleSelect(&bottomScreen);
-	bool isN3ds = false;
 	cout << "Initializing APT services\n";
 	if (R_FAILED(aptInit())) {
 		cout << "Failed to initialize APT services\n";
 		fucked();
 	}
-	APT_CheckNew3DS(&isN3ds);
 	cout << "Initializing AM services\n";
 	if (R_FAILED(amInit())) {
-		cout << "Failed to initialize APT services\n";
+		cout << "Failed to initialize AM services\n";
 		fucked();
 	}
+	cout << "Initializing PTM services\n";
+	if (R_FAILED(ptmSysmInit())) {
+		cout << "Failed to initialize PTM services\n";
+		fucked();
+	}
+}
+void exitServices() {
+		ptmSysmExit();
+		amExit();
+		aptExit();
+		gfxExit();
+}
+
+
+int main(int argc, char* argv[])
+{
+
+	bool isN3ds = false;
+	initServices();
+	APT_CheckNew3DS(&isN3ds);
 
 
 	cout << "\nPress [A] to begin or [Start] to Exit!\n\n";
@@ -47,10 +67,7 @@ int main(int argc, char* argv[])
 		hidScanInput();
 		if (hidKeysDown() & KEY_A) { break; }
 		if (hidKeysDown() & KEY_START) { 
-			amExit();
-
-			gfxExit();
-			fsExit();	
+			exitServices();
 			return 0;
 		}
 	}
@@ -80,7 +97,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	cout<<"\nDone!\nReboot and then open System Update.\n\nPress Start to reboot.";
+	cout<<"\nDone!\nReboot and then open System Update.\n\nPress Start to reboot.\n";
 
 	while (aptMainLoop()) {
 		hidScanInput();
@@ -89,12 +106,8 @@ int main(int argc, char* argv[])
 		gfxSwapBuffers();
 		gspWaitForVBlank();
 	} 
-	APT_HardwareResetAsync();
-
-	amExit();
-
-	aptExit();
-	gfxExit();
+	PTMSYSM_RebootAsync(0);
+	exitServices();
 
 	return 0;
 }
