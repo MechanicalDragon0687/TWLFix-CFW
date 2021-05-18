@@ -10,7 +10,7 @@ using namespace std;
 void initServices();
 void exitServices();
 void fucked();
-
+void installCia(const std::u16string& path, FS_MediaType mediaType, std::function<void (const std::u16string& file, u32 percent)> callback);
 
 u64 getMsetTID(u8 region) {
 // 00020000	00021000	00022000	00026000	00027000	00028000
