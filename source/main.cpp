@@ -81,7 +81,46 @@ void exitServices() {
 		aptExit();
 		gfxExit();
 }
+void installCia(const std::u16string& path, FS_MediaType mediaType, std::function<void (const std::u16string& file, u32 percent)> callback)
+{
+	fs::File ciaFile(path, FS_OPEN_READ), cia;
+	Buffer<u8> buffer(MAX_BUF_SIZE, false);
+	Handle ciaHandle;
+	u32 blockSize;
+	u64 ciaSize, offset = 0;
+	Result res;
 
+
+
+	ciaSize = ciaFile.size();
+	if((res = AM_StartCiaInstall(mediaType, &ciaHandle))) throw titleException(_FILE_, __LINE__, res, "Failed to start CIA installation!");
+	cia.setFileHandle(ciaHandle); // Use the handle returned by AM
+
+
+	for(u32 i=0; i<=ciaSize / MAX_BUF_SIZE; i++)
+	{
+		blockSize = ((ciaSize - offset<MAX_BUF_SIZE) ? ciaSize - offset : MAX_BUF_SIZE);
+
+		if(blockSize>0)
+		{
+			try
+			{
+				ciaFile.read(&buffer, blockSize);
+				cia.write(&buffer, blockSize);
+			} catch(fsException& e)
+			{
+				AM_CancelCIAInstall(ciaHandle); // Abort installation
+				cia.setFileHandle(0); // Reset the handle so it doesn't get closed twice
+				throw;
+			}
+
+			offset += blockSize;
+			if(callback) callback(path, offset * 100 / ciaSize);
+		}
+	}
+
+	if((res = AM_FinishCiaInstall(ciaHandle))) throw titleException(_FILE_, __LINE__, res, "Failed to finish CIA installation!");
+}
 
 int main(int argc, char* argv[])
 {
@@ -130,6 +169,7 @@ int main(int argc, char* argv[])
 			cout << "Failed\n";
 		}else{
 			cout << "Success\n";
+			installCia(u"/TWLFix/" + (*title).second + u".cia")
 		}
 	}
 
