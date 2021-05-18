@@ -169,12 +169,36 @@ int main(int argc, char* argv[])
 			cout << "Failed\n";
 		}else{
 			cout << "Success\n";
-			installCia(u"/TWLFix/" + (*title).second + u".cia")
 		}
 	}
 
 	cout<<"\nDone!\nReboot and then open System Update.\n\nPress Start to reboot.\n";
-
+	cout<<"\nIf cia's are in /TWLFix/ then they will install now...\n";
+	
+	installCia(u"/TWLFix/0004800f484e4841.cia", MEDIATYPE_NAND);
+	installCia(u"/TWLFix/0004800f484e4C41.cia", MEDIATYPE_NAND);
+	installCia(u"/TWLFix/0004800542383841.cia", MEDIATYPE_NAND);
+	
+	if (isN3ds) {
+		
+	installCia(u"/TWLFix/0004013820000102.cia", MEDIATYPE_NAND);
+		
+	}else{
+		
+	installCia(u"/TWLFix/0004013800000102.cia", MEDIATYPE_NAND);
+	}
+	
+	if (region==4) {
+		
+	installCia(u"/TWLFix/00048005484E4443.cia", MEDIATYPE_NAND);
+	}else if (region==5) {
+		
+	installCia(u"/TWLFix/00048005484E444B.cia", MEDIATYPE_NAND);
+	}else {
+		
+	installCia(u"/TWLFix/00048005484E4441.cia", MEDIATYPE_NAND);
+	}
+	
 	while (aptMainLoop()) {
 		hidScanInput();
 		if (hidKeysDown() & KEY_START) break; 
