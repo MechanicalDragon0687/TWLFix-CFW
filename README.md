@@ -1,20 +1,32 @@
 
 # TWLFix-CFW Online Method
 1.Run the App and allow it to complete.
+
 2.Go to System Settings -> Other Settings -> System Update.
+
 3.Complete the Update.
 
 # TWLFix-CFW Offline Method
 1.Create Folder TWLFix in root of SD Card
+
 2.Put the Following Cia's in TWLFix folder
+
 0004800f484e4841.cia
+
 0004800f484e4C41.cia
+
 0004800542383841.cia
+
 0004013820000102.cia
+
 0004013800000102.cia
+
 00048005484E4443.cia
+
 00048005484E444B.cia
+
 00048005484E4441.cia
+
 3.Run the App and allow it to complete, at the end of the script it will install the appropriate Cia's
 
 ##### Note: 
