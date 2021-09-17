@@ -31,7 +31,7 @@ void initServices() {
 	consoleInit(GFX_TOP, &topScreen);
 	consoleInit(GFX_BOTTOM, &bottomScreen);
 	consoleSelect(&bottomScreen);
-	cout << "\nTWLFix v1.2!\n\n";
+	cout << "\nTWLFix v1.3!\n\n";
 
 	cout << "Initializing APT services\n";
 	if (R_FAILED(aptInit())) {
