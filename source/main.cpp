@@ -5,34 +5,14 @@
 #include <unistd.h>
 #include <3ds.h>
 #define SECOND(x) (x*1000ULL*1000ULL*1000ULL)
+#define SYSTEMINFO_TYPE_CFWINFO 0x10000
+#define CFWINFO_PARAM_ISRELEASE 0x200
 PrintConsole topScreen, bottomScreen;
 using namespace std;
 void initServices();
 void exitServices();
 void fucked();
 
-
-u64 getMsetTID(u8 region) {
-// 00020000	00021000	00022000	00026000	00027000	00028000
-// JPN TIDLow	USA TIDLow	EUR TIDLow	CHN TIDLow	KOR TIDLow	TWN TIDLow
-
-	switch(region) {
-		case 0: // JPN
-			return 0x0004001000020F00;
-		case 1: // USA
-			return 0x0004001000021F00;
-		case 2: // EUR
-			return 0x0004001000022F00;
-		case 4: // CHN
-			return 0x0004001000026F00;
-		case 5: // KOR
-			return 0x0004001000027F00;
-		case 6: // TWN
-			return 0x0004001000028F00;
-		default:
-			return 0;
-	}
-}
 
 void fucked() {
 	cout << "\n\nPress [Start] to exit";	
@@ -90,8 +70,13 @@ int main(int argc, char* argv[])
 	initServices();
 	APT_CheckNew3DS(&isN3ds);
 	u8 region=0;
-	Result res = CFGU_SecureInfoGetRegion(&region);
-
+	if (R_FAILED(CFGU_SecureInfoGetRegion(&region))) {
+		region=255;
+	}
+	bool isRelease = (OS_KernelConfig->env_info & 0b1) != 0;
+	if (!isRelease) {
+		cout << "\n*****\nSystem might be a devkit\n*****\n\nRunning this on a devkit WILL ONLY BREAK THINGS!\n";
+	}
 	cout << "\nPress [A] to begin or [Start] to Exit!\n\n";
 	
 	while (1) {
@@ -117,11 +102,11 @@ int main(int argc, char* argv[])
 	}else{
 		Breakables.push_back(std::make_pair("TWL Firm (o3DS)",0x0004013800000102));	// twlfirm o3ds
 	}
-	if (region==4) {
+	if (region==4 || region==255) {
 		Breakables.push_back(std::make_pair("DS Download Play (CHN)",0x00048005484E4443));		// DS Dlp
-	}else if (region==5) {
+	}else if (region==5 || region==255) {
 		Breakables.push_back(std::make_pair("DS Download Play (KOR)",0x00048005484E444B));		// DS Dlp
-	}else {
+	}else if(region != 4 && region != 5){
 		Breakables.push_back(std::make_pair("DS Download Play",0x00048005484E4441));		// DS Dlp
 	}
 	for (vector<std::pair<std::string,u64>>::iterator title=Breakables.begin();title != Breakables.end(); ++title) {
