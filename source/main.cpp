@@ -95,6 +95,7 @@ int main(int argc, char* argv[])
 		std::make_pair("Whitelist",0x0004800f484e4841),		// Whitelist
 		std::make_pair("Version Data",0x0004800f484e4C41),		// Version Data
 		std::make_pair("DS Internet",0x0004800542383841),		// DS Internet
+		std::make_pair("DS Download Play",0x00048005484E4441)		// DS Dlp
 	};
 	if (isN3ds) {
 		Breakables.push_back(std::make_pair("TWL Firm (n3DS)",0x0004013820000102));		// twlfirm n3ds
@@ -106,9 +107,8 @@ int main(int argc, char* argv[])
 		Breakables.push_back(std::make_pair("DS Download Play (CHN)",0x00048005484E4443));		// DS Dlp
 	}else if (region==5 || region==255) {
 		Breakables.push_back(std::make_pair("DS Download Play (KOR)",0x00048005484E444B));		// DS Dlp
-	}else if(region != 4 && region != 5){
-		Breakables.push_back(std::make_pair("DS Download Play",0x00048005484E4441));		// DS Dlp
 	}
+
 	for (vector<std::pair<std::string,u64>>::iterator title=Breakables.begin();title != Breakables.end(); ++title) {
 		cout << "Uninstalling " << (*title).first << "\t";
 		if (R_FAILED(AM_DeleteTitle(MEDIATYPE_NAND, (*title).second))) {
